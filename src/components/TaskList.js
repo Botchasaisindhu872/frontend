@@ -3,6 +3,8 @@ import AddTaskForm from './AddTaskForm';
 import TaskDetails from './TaskDetails';
 import { click } from '@testing-library/user-event/dist/click';
 import ShowSubTask from './ShowSubTask';
+import AlertForm from './AlertForm';
+import EditForm from './EditForm';
 
 class TaskList extends React.Component {
     constructor(props) {
@@ -15,6 +17,8 @@ class TaskList extends React.Component {
             showFormWindow:false,
       showDetailsWindow:false,
       showSubTasks:0,
+      showAlert:false,
+      showEditWindow: false,
           
             
             
@@ -23,6 +27,9 @@ class TaskList extends React.Component {
 
     // Fetch tasks when the component mounts
     componentDidMount() {
+        this.getTasks();
+    }
+    componentDidUpdate() {
         this.getTasks();
     }
 
@@ -42,6 +49,22 @@ class TaskList extends React.Component {
                 this.setState({ error, loading: false });
             });
     }
+    handleDelete = (id) => {
+        
+        this.setState({ taskId:id,showAlert: true}, () => {
+            console.log(this.state.showALert); 
+        });
+
+
+       
+
+    }
+    handleEditClick = (id) => {
+        this.setState({ taskId:id,showEditWindow: true }, () => {
+            console.log(this.state.showEditWindow); 
+        });
+    };
+
 
     handleSubClick = (id) => {
         if(this.state.showSubTasks ==0 ){
@@ -68,10 +91,13 @@ class TaskList extends React.Component {
     };
 
     handleFormClick = (id) => {
-        this.setState({ showFormWindow: true }, () => {
+      console.log(id);
+       
+        this.setState({ taskId :id ,showFormWindow: true}, () => {
             console.log("HII",this.state.showFormWindow); 
         });
-             };
+          };
+        
     handleDetailsClose
     =()=>{
         console.log("Hiii this is details");
@@ -82,14 +108,23 @@ class TaskList extends React.Component {
     };
     handleFormClose=()=>{
         console.log("Hiii this is Form");
-        this.setState({ showFormWindow: false }, () => {
+        this.setState({ showFormWindow: false,showEditWindow:false }, () => {
             console.log(this.state.showDetailsWindow);
         });
 
         
     };
+
+    handleAlertClose=()=>{
+        console.log("Hiii this is Form");
+        this.setState({ showAlert: false}, () => {
+            console.log(this.state.showAlert);
+        });
+
+        
+    };
     render() {
-        const { taskId, tasks, loading, error ,showFormWindow,showDetailsWindow,showSubTasks} = this.state;
+        const { taskId, tasks, loading, error ,showFormWindow,showDetailsWindow,showSubTasks,showAlert,showEditWindow} = this.state;
 
        if (loading) return <div>Loading...</div>;
         if (error) return <div>Error: {error.message}</div>;
@@ -137,8 +172,15 @@ class TaskList extends React.Component {
           {tasks.map(task => (
         <div   className='tasks'>
                 <div key={task.taskId} className='task title'>
+                   
                     <div className='task title name'>{task.taskTitle}</div>
                     <div className='task title buttons'>
+                    <button 
+                            className='ui button blue'  
+                            onClick={() => this.handleEditClick(task.taskId)}
+                        >
+                            Edit task
+                        </button>
                         <button 
                             className='ui button blue'  
                             onClick={() => this.handleDetailsClick(task.taskId)}
@@ -152,6 +194,7 @@ class TaskList extends React.Component {
                         >
                             Add Subtask
                         </button>
+                        <i className='delete big icon' title='Delete this task' onClick={() => this.handleDelete(task.taskId)}></i>
 
                     
 
@@ -175,13 +218,23 @@ class TaskList extends React.Component {
 )}
 {showFormWindow  &&(
     <div id='task form'>
-        <AddTaskForm  handleFormClose={this.handleFormClose} />
+        <AddTaskForm  id={taskId} handleFormClose={this.handleFormClose} />
+    </div>
+)}
+{showAlert  && (
+    <div >
+        <AlertForm  id={taskId} handleAlertClose={this.handleAlertClose} />
+    </div>
+)}
+{showEditWindow  &&(
+    <div id='task form'>
+        <EditForm  id={taskId} handleFormClose={this.handleFormClose} />
     </div>
 )}
  <div className='add task'>
 <button 
                 className='ui button blue' 
-                onClick={() => this.handleFormClick(1)}
+                onClick={() => this.handleFormClick(-1)}
             >
                 Add task
             </button>

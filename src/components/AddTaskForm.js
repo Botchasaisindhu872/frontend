@@ -20,8 +20,14 @@ class AddTaskForm extends React.Component {
 
         fetch(`http://localhost:8080/tasks/${id}`)
             .then(response => {
-                
-                return response.json();
+                if(response.ok)
+                    {
+                    return response.json();
+                    }
+
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error); // Use errorData.message or a default message
+                    });
             })
             .then(data => {
                 console.log(data);
@@ -29,11 +35,12 @@ class AddTaskForm extends React.Component {
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                this.setState({ error, loading: false });
+                this.setState({ error:error, loading: false });
+                alert(error);
             });
     }
     handleSubmit =()=>{
-
+        const { id } = this.props;
        const taskTitle =document.getElementById('title').value ;
        const taskDescription =document.getElementById('desc').value ;
        const deadline =document.getElementById('deadline').value ;
@@ -41,8 +48,8 @@ class AddTaskForm extends React.Component {
        console.log(taskDescription);
        console.log(deadline);
       // console(JSON.stringify({ taskTitle, taskDescription, deadline }));
-
-
+console.log(id);
+if(id==-1){
         
         fetch("http://localhost:8080/tasks?u_id=1&c_id=1",{            
             method : 'POST',
@@ -56,7 +63,14 @@ class AddTaskForm extends React.Component {
         )
             .then(response => {
                 
-                return response.json();
+                if(response.ok)
+                    {
+                    return response.json();
+                    }
+
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error); // Use errorData.message or a default message
+                    });
             })
             .then(data => {
                 console.log(data);
@@ -64,8 +78,46 @@ class AddTaskForm extends React.Component {
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                this.setState({ error, loading: false });
+                this.setState({ error:error, loading: false });
+                alert(error);
             });
+
+
+        }
+        else{
+            fetch(`http://localhost:8080/tasks/${id}/subtasks?u_id=1&c_id=1`,{            
+                method : 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Set the correct Content-Type
+                },
+                body: JSON.stringify({ taskTitle, taskDescription, deadline })
+    
+    
+            }
+            )
+                .then(response => {
+                    
+                    if(response.ok)
+                        {
+                        return response.json();
+                        }
+
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.error); // Use errorData.message or a default message
+                        });
+                
+                                    })
+                .then(data => {
+                    console.log(data);
+                    this.setState({ task: data, loading: false });
+                })
+                .catch(Errormsg => {
+                    this.setState({ error:Errormsg, loading: false });
+                    alert(Errormsg);
+                });
+    
+
+        }
 
             this.setState({showWindow:false});
             this.props.handleFormClose();  
@@ -81,8 +133,9 @@ class AddTaskForm extends React.Component {
     
     render() {
         const { task, title,   desc,deadline,loading,error,showWindow } = this.state;
+        const { id } = this.props.id;
       //  if (loading) return <div>Loading...</div>;
-    //if (error) return <div>Error: {error.message}</div>;
+if (error) return alert('This is an alert message!',error.error);
 if(showWindow)
         return (
             

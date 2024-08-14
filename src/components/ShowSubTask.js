@@ -65,9 +65,10 @@ class ShowSubTask extends React.Component{
                 <li >{task.taskTitle}  <button className='ui button blue'   onClick={() =>this.handleDetailsClick(task.taskId)}   >
                  Show Subtask details
             </button>
+            
             <br/>
             <br/>
-            <br/>
+           
             
             </li>
             
