@@ -19,6 +19,7 @@ class TaskList extends React.Component {
       showSubTasks:0,
       showAlert:false,
       showEditWindow: false,
+      updateList:false,
           
             
             
@@ -30,7 +31,16 @@ class TaskList extends React.Component {
         this.getTasks();
     }
     componentDidUpdate() {
+console.log("re rendered");
+        if(this.state.updateList==true){
+            console.log("hiii this is update")
+        
         this.getTasks();
+        console.log(this.state.tasks);
+        this.setState({ updateList:false});
+        this.getTasks();
+
+        }
     }
 
     getTasks() {
@@ -52,7 +62,7 @@ class TaskList extends React.Component {
     handleDelete = (id) => {
         
         this.setState({ taskId:id,showAlert: true}, () => {
-            console.log(this.state.showALert); 
+            console.log('THII this is delete',this.state.showALert); 
         });
 
 
@@ -60,7 +70,7 @@ class TaskList extends React.Component {
 
     }
     handleEditClick = (id) => {
-        this.setState({ taskId:id,showEditWindow: true }, () => {
+        this.setState({ taskId:id,showEditWindow: true ,updateList:true}, () => {
             console.log(this.state.showEditWindow); 
         });
     };
@@ -107,9 +117,9 @@ class TaskList extends React.Component {
 
     };
     handleFormClose=()=>{
-        console.log("Hiii this is Form");
-        this.setState({ showFormWindow: false,showEditWindow:false }, () => {
-            console.log(this.state.showDetailsWindow);
+        console.log("Hiii this is Form close");
+        this.setState({ showFormWindow: false,showEditWindow:false ,updateList:true}, () => {
+            console.log(this.state.showDetailsWindow,this.state.updateList);
         });
 
         
@@ -117,7 +127,7 @@ class TaskList extends React.Component {
 
     handleAlertClose=()=>{
         console.log("Hiii this is Form");
-        this.setState({ showAlert: false}, () => {
+        this.setState({ showAlert: false,updateList:true}, () => {
             console.log(this.state.showAlert);
         });
 
@@ -127,7 +137,6 @@ class TaskList extends React.Component {
         const { taskId, tasks, loading, error ,showFormWindow,showDetailsWindow,showSubTasks,showAlert,showEditWindow} = this.state;
 
        if (loading) return <div>Loading...</div>;
-        if (error) return <div>Error: {error.message}</div>;
         
     /*    return (
             <div className='task list'>

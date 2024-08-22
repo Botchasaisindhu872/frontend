@@ -17,12 +17,14 @@ class AlertForm extends React.Component {
 
 
         }
+       ).then(()=>{
+        this.props.handleAlertClose();
+       }
        ).catch(error => {
                 console.error('Fetch error:', error);
                 this.setState({ error, loading: false });
             });
-            console.log("Hiii this is Alert");
-            this.props.handleAlertClose();
+           
 
 
         

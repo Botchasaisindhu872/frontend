@@ -47,7 +47,13 @@ class AddTaskForm extends React.Component {
        console.log(taskTitle);
        console.log(taskDescription);
        console.log(deadline);
+
+       const regex = /^\d{2}-\d{2}-\d{4}$/;
+        if (!deadline.match(regex)) {
+            alert("enter valid date ");
+        }
       // console(JSON.stringify({ taskTitle, taskDescription, deadline }));
+      else{
 console.log(id);
 if(id==-1){
         
@@ -75,6 +81,8 @@ if(id==-1){
             .then(data => {
                 console.log(data);
                 this.setState({ task: data, loading: false });
+                this.setState({showWindow:false});
+                this.props.handleFormClose();  
             })
             .catch(error => {
                 console.error('Fetch error:', error);
@@ -103,13 +111,17 @@ if(id==-1){
                         }
 
                         return response.json().then(errorData => {
-                            throw new Error(errorData.error); // Use errorData.message or a default message
+                            throw new Error(errorData.error); 
                         });
                 
                                     })
                 .then(data => {
                     console.log(data);
+
+
                     this.setState({ task: data, loading: false });
+                    this.setState({showWindow:false});
+                    this.props.handleFormClose();  
                 })
                 .catch(Errormsg => {
                     this.setState({ error:Errormsg, loading: false });
@@ -118,9 +130,9 @@ if(id==-1){
     
 
         }
+    }
 
-            this.setState({showWindow:false});
-            this.props.handleFormClose();  
+           
     };
 
     handleClose =()=>{
@@ -135,7 +147,6 @@ if(id==-1){
         const { task, title,   desc,deadline,loading,error,showWindow } = this.state;
         const { id } = this.props.id;
       //  if (loading) return <div>Loading...</div>;
-if (error) return alert('This is an alert message!',error.error);
 if(showWindow)
         return (
             
@@ -152,7 +163,7 @@ if(showWindow)
                     <textarea id="desc" name="desc" rows="8" cols="65"></textarea>     
                     <div className='field'>  <br/> 
                     <label htmlFor="deadline ">Deadline</label><br/>
-                    <input type="text" id="deadline" name="deadline"/><br/>
+                    <input type="text" id="deadline" name="deadline" placeholder='dd-mm-yyyy'/><br/>
                     </div>
                     <div className='ui button blue' onClick={()=> this.handleSubmit()}> Submit</div><br/>
                     <br/>

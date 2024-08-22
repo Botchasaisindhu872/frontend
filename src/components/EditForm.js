@@ -11,6 +11,7 @@ class EditForm extends React.Component {
             loading: true,
             error: null,
             showWindow: true,
+            updateList:false,
         };
     }
 
@@ -20,11 +21,21 @@ class EditForm extends React.Component {
         this.getTaskById();
     }
 
+
     getTaskById() {
         const { id } = this.props; // Access the id prop
 
         fetch(`http://localhost:8080/tasks/${id}`)
-            .then(response => response.json())
+            .then(response => {
+                if(response.ok)
+                    {
+                    return response.json();
+                    }
+
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error); // Use errorData.message or a default message
+                    });
+            })
             .then(data => {
                 console.log(data);
                 this.setState({
@@ -43,6 +54,7 @@ class EditForm extends React.Component {
             .catch(error => {
                 console.error('Fetch error:', error);
                 this.setState({ error, loading: false });
+                alert(error);
             });
     }
 
@@ -51,7 +63,12 @@ class EditForm extends React.Component {
         const taskTitle = document.getElementById('title').value;
         const taskDescription = document.getElementById('desc').value;
         const deadline = document.getElementById('deadline').value;
-
+        const regex = /^\d{2}-\d{2}-\d{4}$/;
+        if (!deadline.match(regex)) {
+            console.log(deadline);
+            alert("enter valid date ");
+        }
+        else{
         fetch(`http://localhost:8080/tasks/${id}?u_id=1&c_id=1`, {
             method: 'PUT',
             headers: {
@@ -59,18 +76,31 @@ class EditForm extends React.Component {
             },
             body: JSON.stringify({ taskTitle, taskDescription, deadline })
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                this.setState({ task: data, loading: false });
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                this.setState({ error, loading: false });
-            });
+        .then(response => {
+                    
+            if(response.ok)
+                {
+                return response.json();
+                }
 
-        this.setState({ showWindow: false });
-        this.props.handleFormClose();
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error); 
+                });
+        
+                            })
+            .then(data => {
+                console.log(data.deadline);
+
+                this.setState({ task: data, loading: false });
+                this.setState({ showWindow: false });
+                this.props.handleFormClose();
+            })
+            .catch(Errormsg => {
+                this.setState({ error:Errormsg, loading: false });
+                alert(Errormsg);
+            });
+        }
+       
     };
 
     handleClose = () => {
@@ -95,7 +125,7 @@ class EditForm extends React.Component {
                         <textarea id="desc" name="desc" rows="8" cols="65"></textarea>
                         <div className='field'>  <br />
                             <label htmlFor="deadline ">Deadline</label><br />
-                            <input type="text" id="deadline" name="deadline" /><br />
+                            <input type="text" id="deadline" name="deadline" placeholder='dd-mm-yyyy'/><br />
                         </div>
                         <div className='ui button blue' onClick={this.handleSubmit}> Submit</div><br />
                         <br />
